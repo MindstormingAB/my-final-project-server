@@ -97,7 +97,13 @@ app.post("/sessions", async (req, res) => {
 // Test endpoint
 // app.get("/testing", authenticateUser);
 app.get("/testing", async (req, res) => {
-  res.send("Test endpoint");
+  try {
+    const seizure = await new Seizure(req.body).save();
+    res.status(200).json(seizure);
+  } catch (err) {
+    res.status(400).json({ message: "Could not register seizure", errors: err })
+  };
+  // res.send("Test endpoint");
 });
 
 // Get user info with authentication
@@ -129,7 +135,19 @@ app.post("/contacts", async (req, res) => {
     res.status(200).json(contact);
   } catch (err) {
     res.status(400).json({ message: "Could not create contact", errors: err })
-  }
+  };
+});
+
+// Register new seizure
+app.post("/seizures", authenticateUser);
+app.post("/seizures", async (req, res) => {
+  try {
+    const seizureData = { userId: req.user._id, ...req.body };
+    const seizure = await new Seizure(seizureData).save();
+    res.status(200).json(seizure);
+  } catch (err) {
+    res.status(400).json({ message: "Could not register seizure", errors: err })
+  };
 });
 
 // Start the server

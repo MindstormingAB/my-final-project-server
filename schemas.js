@@ -1,6 +1,13 @@
 import mongoose from "mongoose";
 import crypto from "crypto";
 
+import seizureTypes from "./data/seizure-types.json";
+import contactTypes from "./data/contact-types.json";
+
+const seizureNames = seizureTypes.map(type => type.name);
+const contactNames = contactTypes.map(type => type.name);
+const contactCategories = contactTypes.map(type => type.category);
+
 export const userSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -33,33 +40,51 @@ export const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 export const seizureSchema = new mongoose.Schema({
-  userId: {
+  seizureUserId: {
     type: String,
   },
-  date: {
+  seizureDate: {
     type: Date,
-    default: Date.now, // https://stackoverflow.com/questions/55798779/store-only-time-in-mongodb
   },
-  length: {
-    type: Date,
+  seizureLength: {
+    hours: {
+      type: Number,
+    },
+    minutes: {
+      type: Number,
+    },
+    seconds: {
+      type: Number,
+    },
   },
   seizureType: {
     type: String,
+    enum: seizureNames,
   },
-  trigger: {
+  seizureTrigger: {
     type: String,
   },
-  comment: {
+  seizureComment: {
     type: String,
   }
 }, { timestamps: true });
 
+export const seizureTypeSchema = new mongoose.Schema({
+  seizureName: {
+    type: String
+  },
+  seizureDescription: {
+    type: String
+  }
+})
+
 export const contactSchema = new mongoose.Schema({
-  userId: {
+  contactUserId: {
     type: String,
   },
   contactType: {
     type: String,
+    enum: contactNames,
   },
   contactFirstName: {
     type: String,
@@ -67,10 +92,11 @@ export const contactSchema = new mongoose.Schema({
   contactSurname: {
     type: String,
   },
-  phoneNumber: {
+  contactPhoneNumber: {
     type: String,
   },
-  relation: {
-    type: String
+  contactCategory: {
+    type: String,
+    enum: contactCategories,
   }
 }, { timestamps: true });
