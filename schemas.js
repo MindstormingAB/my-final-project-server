@@ -67,7 +67,9 @@ export const seizureSchema = new mongoose.Schema({
   seizureComment: {
     type: String,
   }
-}, { timestamps: true });
+},
+  { timestamps: true }
+);
 
 export const seizureTypeSchema = new mongoose.Schema({
   seizureName: {
@@ -76,7 +78,7 @@ export const seizureTypeSchema = new mongoose.Schema({
   seizureDescription: {
     type: String
   }
-})
+});
 
 export const contactSchema = new mongoose.Schema({
   contactUserId: {
@@ -99,4 +101,6 @@ export const contactSchema = new mongoose.Schema({
     type: String,
     enum: contactCategories,
   }
-}, { timestamps: true });
+},
+  { timestamps: true }
+);

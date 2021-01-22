@@ -110,8 +110,8 @@ app.get("/testing", async (req, res) => {
 app.get("/userdata", authenticateUser);
 app.get("/userdata", async (req, res) => {
   try {
-    const seizures = await Seizure.find({ userId: req.user._id });
-    const contacts = await Contact.find({ userId: req.user._id });
+    const seizures = await Seizure.find({ seizureUserId: req.user._id });
+    const contacts = await Contact.find({ contactUserId: req.user._id });
     res.status(200).json({
       userId: req.user._id,
       email: req.user.email,
@@ -130,7 +130,7 @@ app.get("/userdata", async (req, res) => {
 app.post("/contacts", authenticateUser);
 app.post("/contacts", async (req, res) => {
   try {
-    const contactData = { userId: req.user._id, ...req.body };
+    const contactData = { contactUserId: req.user._id, ...req.body };
     const contact = await new Contact(contactData).save();
     res.status(200).json(contact);
   } catch (err) {
@@ -142,7 +142,7 @@ app.post("/contacts", async (req, res) => {
 app.post("/seizures", authenticateUser);
 app.post("/seizures", async (req, res) => {
   try {
-    const seizureData = { userId: req.user._id, ...req.body };
+    const seizureData = { seizureUserId: req.user._id, ...req.body };
     const seizure = await new Seizure(seizureData).save();
     res.status(200).json(seizure);
   } catch (err) {
