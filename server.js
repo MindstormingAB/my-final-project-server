@@ -2,8 +2,11 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import mongoose from "mongoose";
-import crypto from "crypto";
 import bcrypt from "bcrypt";
+
+import { userSchema } from "./schemas";
+import { seizureSchema } from "./schemas";
+import { contactSchema } from "./schemas";
 
 const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/EpApp";
 mongoose.connect(mongoUrl, {
@@ -13,105 +16,6 @@ mongoose.connect(mongoUrl, {
   // useFindAndModify: false // To get rid of deprecation warning regarding findOneAndUpdate()
 });
 mongoose.Promise = Promise;
-
-const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    minlength: 5,
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 5,
-  },
-  accessToken: {
-    type: String,
-    default: () => crypto.randomBytes(128).toString("hex"),
-    unique: true,
-  },
-  profile: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Profile"
-  },
-  seizures: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Seizure"
-    }
-  ],
-  contacts: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Contact"
-    }
-  ]
-});
-
-const Profile = new mongoose.model("Profile", {
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
-  },
-  firstName: {
-    type: String,
-    default: "",
-  },
-  surname: {
-    type: String,
-    default: "",
-  },
-  birthDate: {
-    type: Number,
-    default: "",
-  },
-});
-
-const Seizure = new mongoose.model("Seizure", {
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
-  },
-  date: {
-    type: Date,
-    default: Date.now, // https://stackoverflow.com/questions/55798779/store-only-time-in-mongodb
-  },
-  length: {
-    type: Date,
-  },
-  seizureType: {
-    type: String,
-  },
-  trigger: {
-    type: String,
-  },
-  comment: {
-    type: String,
-  }
-});
-
-const Contact = new mongoose.model("Contact", {
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
-  },
-  contactType: {
-    type: String,
-  },
-  contactFirstName: {
-    type: String,
-  },
-  contactSurname: {
-    type: String,
-  },
-  phoneNumber: {
-    type: String,
-  },
-  relation: {
-    type: String
-  }
-});
 
 userSchema.pre("save", async function (next) {
   const user = this;
@@ -124,15 +28,21 @@ userSchema.pre("save", async function (next) {
 });
 
 const User = mongoose.model("User", userSchema);
+const Seizure = mongoose.model("Seizure", seizureSchema);
+const Contact = mongoose.model("Contact", contactSchema);
 
 const authenticateUser = async (req, res, next) => {
   try {
     const user = await User.findOne({ accessToken: req.header("Authorization") });
+    if (!user) {
+      throw "User not found";
+    }
     req.user = user;
     next();
   } catch (err) {
-    res.status(401).json({ loggedOut: true });
-  }
+    const errorMessage = 'Please try logging in again';
+    res.status(401).json({ error: errorMessage });
+  };
 };
 
 // Definition of the port the app will run on.
@@ -184,16 +94,26 @@ app.post("/sessions", async (req, res) => {
   };
 });
 
+// Test endpoint
+// app.get("/testing", authenticateUser);
+app.get("/testing", async (req, res) => {
+  res.send("Test endpoint");
+});
+
 // Get user info with authentication
 app.get("/userdata", authenticateUser);
 app.get("/userdata", async (req, res) => {
   try {
+    const seizures = await Seizure.find({ userId: req.user._id });
+    const contacts = await Contact.find({ userId: req.user._id });
     res.status(200).json({
       userId: req.user._id,
       email: req.user.email,
-      profile: req.user.profile,
-      seizures: req.user.seizures,
-      contacts: req.user.contacts,
+      firstName: req.user.firstName,
+      surname: req.user.surname,
+      birthDate: req.user.birthDate,
+      seizures: seizures,
+      contacts: contacts,
     });
   } catch (err) {
     res.status(403).json({ error: "Access Denied" });
