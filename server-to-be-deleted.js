@@ -8,7 +8,7 @@ import { userSchema } from "./schemas";
 import { seizureSchema } from "./schemas";
 import { contactSchema } from "./schemas";
 
-const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/epApp";
+const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/EpApp2";
 mongoose.connect(mongoUrl, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -40,7 +40,7 @@ const authenticateUser = async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
-    const errorMessage = "Please try logging in again";
+    const errorMessage = 'Please try logging in again';
     res.status(401).json({ error: errorMessage });
   };
 };
@@ -74,10 +74,7 @@ app.post("/users", async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await new User({ email, password }).save();
-    res.status(200).json({
-      userId: user._id,
-      accessToken: user.accessToken
-    });
+    res.status(200).json({ userId: user._id, accessToken: user.accessToken });
   } catch (err) {
     res.status(400).json({ message: "Could not create user", errors: err });
   };
@@ -106,9 +103,7 @@ app.get("/testing", async (req, res) => {
 // Get user info with authentication
 app.get("/userdata", authenticateUser);
 app.get("/userdata", async (req, res) => {
-  if (req.header("userId") != req.user._id) {
-    res.status(403).json({ error: "Access Denied" });
-  } else {
+  try {
     const seizures = await Seizure.find({ seizureUserId: req.user._id });
     const contacts = await Contact.find({ contactUserId: req.user._id });
     res.status(200).json({
@@ -120,6 +115,8 @@ app.get("/userdata", async (req, res) => {
       seizures: seizures,
       contacts: contacts,
     });
+  } catch (err) {
+    res.status(403).json({ error: "Access Denied" });
   };
 });
 
@@ -127,13 +124,9 @@ app.get("/userdata", async (req, res) => {
 app.post("/contacts", authenticateUser);
 app.post("/contacts", async (req, res) => {
   try {
-    if (req.header("userId") != req.user._id) {
-      res.status(403).json({ error: "Access Denied" });
-    } else {
-      const contactData = { contactUserId: req.user._id, ...req.body };
-      const contact = await new Contact(contactData).save();
-      res.status(200).json(contact);
-    }
+    const contactData = { contactUserId: req.user._id, ...req.body };
+    const contact = await new Contact(contactData).save();
+    res.status(200).json(contact);
   } catch (err) {
     res.status(400).json({ message: "Could not create contact", errors: err })
   };
@@ -143,13 +136,9 @@ app.post("/contacts", async (req, res) => {
 app.post("/seizures", authenticateUser);
 app.post("/seizures", async (req, res) => {
   try {
-    if (req.header("userId") != req.user._id) {
-      res.status(403).json({ error: "Access Denied" });
-    } else {
-      const seizureData = { seizureUserId: req.user._id, ...req.body };
-      const seizure = await new Seizure(seizureData).save();
-      res.status(200).json(seizure);
-    }
+    const seizureData = { seizureUserId: req.user._id, ...req.body };
+    const seizure = await new Seizure(seizureData).save();
+    res.status(200).json(seizure);
   } catch (err) {
     res.status(400).json({ message: "Could not register seizure", errors: err })
   };

@@ -6,7 +6,7 @@ import contactTypes from "./data/contact-types.json";
 
 const seizureNames = seizureTypes.map(type => type.name);
 const contactNames = contactTypes.map(type => type.name);
-const contactCategories = contactTypes.map(type => type.categories).flat();
+const contactCategories = contactTypes.map(type => type.category);
 
 export const userSchema = new mongoose.Schema({
   email: {
@@ -70,6 +70,15 @@ export const seizureSchema = new mongoose.Schema({
 },
   { timestamps: true }
 );
+
+export const seizureTypeSchema = new mongoose.Schema({
+  seizureName: {
+    type: String
+  },
+  seizureDescription: {
+    type: String
+  }
+});
 
 export const contactSchema = new mongoose.Schema({
   contactUserId: {
