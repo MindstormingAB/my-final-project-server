@@ -140,13 +140,13 @@ app.patch("/userdata", async (req, res) => {
         { "_id": req.user._id },
         {
           $set: {
-            "email": email,
-            "firstName": firstName,
-            "surname": surname,
-            "birthDate": birthDate
+            email,
+            firstName,
+            surname,
+            birthDate
           }
         },
-        { new: true }
+        { new: true, runValidators: true }
       );
       res.status(200).json({
         email: user.email,
@@ -173,6 +173,47 @@ app.post("/contacts", async (req, res) => {
     }
   } catch (err) {
     res.status(400).json({ message: "Could not create contact", errors: err })
+  };
+});
+
+// Update contact
+app.patch("/contacts", authenticateUser);
+app.patch("/contacts", async (req, res) => {
+  try {
+    if (req.header("userId") != req.user._id) {
+      res.status(403).json({ error: "Access Denied" });
+    } else {
+      const queriedContact = await Contact.findOne({ _id: req.header("contactId") });
+      const {
+        contactType = queriedContact.contactType,
+        contactFirstName = queriedContact.contactFirstName,
+        contactSurname = queriedContact.contactSurname,
+        contactPhoneNumber = queriedContact.contactPhoneNumber,
+        contactCategory = queriedContact.contactCategory
+      } = req.body;
+      const contact = await Contact.findOneAndUpdate(
+        { "_id": req.header("contactId") },
+        {
+          $set: {
+            contactType,
+            contactFirstName,
+            contactSurname,
+            contactPhoneNumber,
+            contactCategory
+          }
+        },
+        { new: true, runValidators: true }
+      );
+      res.status(200).json({
+        contactType: contact.contactType,
+        contactFirstName: contact.contactFirstName,
+        contactSurname: contact.contactSurname,
+        contactPhoneNumber: contact.contactPhoneNumber,
+        contactCategory: contact.contactCategory
+      });
+    }
+  } catch (err) {
+    res.status(400).json({ message: "Could not update contact", errors: err })
   };
 });
 
