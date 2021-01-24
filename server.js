@@ -97,12 +97,6 @@ app.post("/sessions", async (req, res) => {
   };
 });
 
-// Test endpoint
-// app.get("/testing", authenticateUser);
-app.get("/testing", async (req, res) => {
-  res.send("Test endpoint");
-});
-
 // Get user data with authentication
 app.get("/userdata", authenticateUser);
 app.get("/userdata", async (req, res) => {
@@ -169,9 +163,6 @@ app.delete("/userdata", async (req, res) => {
     await User.deleteOne({ _id: req.user._id })
     await Seizure.deleteMany({ seizureUserId: req.user._id });
     await Contact.deleteMany({ contactUserId: req.user._id });
-    // const user = await User.deleteOne({ _id: req.user._id })
-    // const seizures = await Seizure.deleteMany({ seizureUserId: req.user._id });
-    // const contacts = await Contact.deleteMany({ contactUserId: req.user._id });
     res.status(200).json({ message: `All data related to user ${req.user._id} has been deleted` });
   };
 });
