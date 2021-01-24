@@ -233,6 +233,47 @@ app.post("/seizures", async (req, res) => {
   };
 });
 
+// Update seizure
+app.patch("/seizures", authenticateUser);
+app.patch("/seizures", async (req, res) => {
+  try {
+    if (req.header("userId") != req.user._id) {
+      res.status(403).json({ error: "Access Denied" });
+    } else {
+      const queriedSeizure = await Seizure.findOne({ _id: req.header("seizureId") });
+      const {
+        seizureDate = queriedSeizure.seizureDate,
+        seizureLength = queriedSeizure.seizureLength,
+        seizureType = queriedSeizure.seizureType,
+        seizureTrigger = queriedSeizure.seizureTrigger,
+        seizureComment = queriedSeizure.seizureComment
+      } = req.body;
+      const seizure = await Seizure.findOneAndUpdate(
+        { "_id": req.header("seizureId") },
+        {
+          $set: {
+            seizureDate,
+            seizureLength,
+            seizureType,
+            seizureTrigger,
+            seizureComment
+          }
+        },
+        { new: true, runValidators: true }
+      );
+      res.status(200).json({
+        seizureDate: seizure.seizureDate,
+        seizureLength: seizure.seizureLength,
+        seizureType: seizure.seizureType,
+        seizureTrigger: seizure.seizureTrigger,
+        seizureComment: seizure.seizureComment
+      });
+    }
+  } catch (err) {
+    res.status(400).json({ message: "Could not update seizure", errors: err })
+  };
+});
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
