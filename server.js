@@ -103,7 +103,7 @@ app.get("/testing", async (req, res) => {
   res.send("Test endpoint");
 });
 
-// Get user info with authentication
+// Get user data with authentication
 app.get("/userdata", authenticateUser);
 app.get("/userdata", async (req, res) => {
   if (req.header("userId") != req.user._id) {
@@ -160,6 +160,22 @@ app.patch("/userdata", async (req, res) => {
   };
 });
 
+// Delete user and user data
+app.delete("/userdata", authenticateUser);
+app.delete("/userdata", async (req, res) => {
+  if (req.header("userId") != req.user._id) {
+    res.status(403).json({ error: "Access Denied" });
+  } else {
+    await User.deleteOne({ _id: req.user._id })
+    await Seizure.deleteMany({ seizureUserId: req.user._id });
+    await Contact.deleteMany({ contactUserId: req.user._id });
+    // const user = await User.deleteOne({ _id: req.user._id })
+    // const seizures = await Seizure.deleteMany({ seizureUserId: req.user._id });
+    // const contacts = await Contact.deleteMany({ contactUserId: req.user._id });
+    res.status(200).json({ message: `All data related to user ${req.user._id} has been deleted` });
+  };
+});
+
 // Register new contact
 app.post("/contacts", authenticateUser);
 app.post("/contacts", async (req, res) => {
@@ -204,16 +220,27 @@ app.patch("/contacts", async (req, res) => {
         },
         { new: true, runValidators: true }
       );
-      res.status(200).json({
-        contactType: contact.contactType,
-        contactFirstName: contact.contactFirstName,
-        contactSurname: contact.contactSurname,
-        contactPhoneNumber: contact.contactPhoneNumber,
-        contactCategory: contact.contactCategory
-      });
+      res.status(200).json(contact);
     }
   } catch (err) {
     res.status(400).json({ message: "Could not update contact", errors: err })
+  };
+});
+
+// Delete contact
+app.delete("/contacts", authenticateUser);
+app.delete("/contacts", async (req, res) => {
+  try {
+    if (req.header("userId") != req.user._id) {
+      res.status(403).json({ error: "Access Denied" });
+    } else {
+      const contact = await Contact.findOneAndDelete(
+        { "_id": req.header("contactId") }
+      );
+      res.status(200).json(contact);
+    }
+  } catch (err) {
+    res.status(400).json({ message: "Could not delete contact", errors: err })
   };
 });
 
@@ -261,16 +288,27 @@ app.patch("/seizures", async (req, res) => {
         },
         { new: true, runValidators: true }
       );
-      res.status(200).json({
-        seizureDate: seizure.seizureDate,
-        seizureLength: seizure.seizureLength,
-        seizureType: seizure.seizureType,
-        seizureTrigger: seizure.seizureTrigger,
-        seizureComment: seizure.seizureComment
-      });
+      res.status(200).json(seizure);
     }
   } catch (err) {
     res.status(400).json({ message: "Could not update seizure", errors: err })
+  };
+});
+
+// Delete seizure
+app.delete("/seizures", authenticateUser);
+app.delete("/seizures", async (req, res) => {
+  try {
+    if (req.header("userId") != req.user._id) {
+      res.status(403).json({ error: "Access Denied" });
+    } else {
+      const seizure = await Seizure.findOneAndDelete(
+        { "_id": req.header("seizureId") }
+      );
+      res.status(200).json(seizure);
+    }
+  } catch (err) {
+    res.status(400).json({ message: "Could not delete seizure", errors: err })
   };
 });
 
