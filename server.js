@@ -13,7 +13,7 @@ mongoose.connect(mongoUrl, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true, // To get rid of deprecation warning regarding collection.ensureIndex
-  // useFindAndModify: false // To get rid of deprecation warning regarding findOneAndUpdate()
+  useFindAndModify: false // To get rid of deprecation warning regarding findOneAndUpdate()
 });
 mongoose.Promise = Promise;
 
@@ -120,6 +120,43 @@ app.get("/userdata", async (req, res) => {
       seizures: seizures,
       contacts: contacts,
     });
+  };
+});
+
+// Update user's profile
+app.patch("/userdata", authenticateUser);
+app.patch("/userdata", async (req, res) => {
+  try {
+    if (req.header("userId") != req.user._id) {
+      res.status(403).json({ error: "Access Denied" });
+    } else {
+      const {
+        email = req.user.email,
+        firstName = req.user.firstName,
+        surname = req.user.surname,
+        birthDate = req.user.birthDate
+      } = req.body;
+      const user = await User.findOneAndUpdate(
+        { "_id": req.user._id },
+        {
+          $set: {
+            "email": email,
+            "firstName": firstName,
+            "surname": surname,
+            "birthDate": birthDate
+          }
+        },
+        { new: true }
+      );
+      res.status(200).json({
+        email: user.email,
+        firstName: user.firstName,
+        surname: user.surname,
+        birthDate: user.birthDate
+      });
+    }
+  } catch (err) {
+    res.status(400).json({ message: "Could not update user", errors: err });
   };
 });
 
