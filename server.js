@@ -51,7 +51,7 @@ const app = express();
 const listEndpoints = require("express-list-endpoints");
 
 // Middlewares to enable cors and json body parsing
-const allowedDomains = ["https://ep-app.netlify.app", "http://localhost:3000"];
+const allowedDomains = ["https://epilepsy-app.netlify.app", "http://localhost:3000"];
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
@@ -167,6 +167,21 @@ app.delete("/userdata", async (req, res) => {
   };
 });
 
+// Retrieve all contacts
+app.get("/contacts", authenticateUser);
+app.get("/contacts", async (req, res) => {
+  try {
+    if (req.header("userId") != req.user._id) {
+      res.status(403).json({ error: "Access Denied" });
+    } else {
+      const contacts = await Contact.find({ contactUserId: req.user._id });
+      res.status(200).json(contacts);
+    }
+  } catch (err) {
+    res.status(400).json({ message: "Could not retrieve contacts", errors: err })
+  };
+});
+
 // Register new contact
 app.post("/contacts", authenticateUser);
 app.post("/contacts", async (req, res) => {
@@ -232,6 +247,21 @@ app.delete("/contacts", async (req, res) => {
     }
   } catch (err) {
     res.status(400).json({ message: "Could not delete contact", errors: err })
+  };
+});
+
+// Retrieve all seizures
+app.get("/seizures", authenticateUser);
+app.get("/seizures", async (req, res) => {
+  try {
+    if (req.header("userId") != req.user._id) {
+      res.status(403).json({ error: "Access Denied" });
+    } else {
+      const seizures = await Seizure.find({ seizureUserId: req.user._id });
+      res.status(200).json(seizures);
+    }
+  } catch (err) {
+    res.status(400).json({ message: "Could not retrieve seizures", errors: err })
   };
 });
 
