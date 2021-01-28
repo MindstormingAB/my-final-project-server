@@ -88,9 +88,17 @@ app.post("/sessions", async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (user && bcrypt.compareSync(password, user.password)) {
+    const seizures = await Seizure.find({ seizureUserId: user._id });
+    const contacts = await Contact.find({ contactUserId: user._id });
     res.status(200).json({
       userId: user._id,
-      accessToken: user.accessToken
+      accessToken: user.accessToken,
+      email: user.email,
+      firstName: user.firstName,
+      surname: user.surname,
+      birthDate: user.birthDate,
+      seizures: seizures,
+      contacts: contacts,
     });
   } else {
     res.status(404).json({ notFound: true });
@@ -107,6 +115,7 @@ app.get("/userdata", async (req, res) => {
     const contacts = await Contact.find({ contactUserId: req.user._id });
     res.status(200).json({
       userId: req.user._id,
+      accessToken: req.user.accessToken,
       email: req.user.email,
       firstName: req.user.firstName,
       surname: req.user.surname,
