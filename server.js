@@ -88,7 +88,7 @@ app.post("/sessions", async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (user && bcrypt.compareSync(password, user.password)) {
-    const seizures = await Seizure.find({ seizureUserId: user._id });
+    const seizures = await Seizure.find({ seizureUserId: user._id }).sort({ seizureDate: "desc" }).exec();
     const contacts = await Contact.find({ contactUserId: user._id });
     res.status(200).json({
       userId: user._id,
@@ -111,7 +111,7 @@ app.get("/userdata", async (req, res) => {
   if (req.header("userId") != req.user._id) {
     res.status(403).json({ error: "Access Denied" });
   } else {
-    const seizures = await Seizure.find({ seizureUserId: req.user._id });
+    const seizures = await Seizure.find({ seizureUserId: req.user._id }).sort({ seizureDate: "desc" }).exec();
     const contacts = await Contact.find({ contactUserId: req.user._id });
     res.status(200).json({
       userId: req.user._id,
@@ -266,7 +266,7 @@ app.get("/seizures", async (req, res) => {
     if (req.header("userId") != req.user._id) {
       res.status(403).json({ error: "Access Denied" });
     } else {
-      const seizures = await Seizure.find({ seizureUserId: req.user._id });
+      const seizures = await Seizure.find({ seizureUserId: req.user._id }).sort({ seizureDate: "desc" }).exec();
       res.status(200).json(seizures);
     }
   } catch (err) {
