@@ -76,7 +76,11 @@ app.post("/users", async (req, res) => {
     const user = await new User({ email, password }).save();
     res.status(200).json({
       userId: user._id,
-      accessToken: user.accessToken
+      accessToken: user.accessToken,
+      email: user.email,
+      firstName: user.firstName,
+      surname: user.surname,
+      birthDate: user.birthDate,
     });
   } catch (err) {
     res.status(400).json({ message: "Could not create user", errors: err });
@@ -152,6 +156,8 @@ app.patch("/userdata", async (req, res) => {
         { new: true, runValidators: true }
       );
       res.status(200).json({
+        userId: user._id,
+        accessToken: user.accessToken,
         email: user.email,
         firstName: user.firstName,
         surname: user.surname,
