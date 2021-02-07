@@ -7,6 +7,11 @@ import bcrypt from "bcrypt";
 import { userSchema } from "./schemas";
 import { seizureSchema } from "./schemas";
 import { contactSchema } from "./schemas";
+import { seizureTypeSchema } from "./schemas";
+import { contactTypeSchema } from "./schemas";
+
+import contactTypes from "./data/contact-types.json";
+import seizureTypes from "./data/seizure-types.json";
 
 const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/epApp";
 mongoose.connect(mongoUrl, {
@@ -30,6 +35,26 @@ userSchema.pre("save", async function (next) {
 const User = mongoose.model("User", userSchema);
 const Seizure = mongoose.model("Seizure", seizureSchema);
 const Contact = mongoose.model("Contact", contactSchema);
+const SeizureType = mongoose.model("SeizureType", seizureTypeSchema);
+const ContactType = mongoose.model("ContactType", contactTypeSchema);
+
+if (process.env.RESET_DATABASE) {
+  const populateDatabase = async () => {
+    await SeizureType.deleteMany();
+    await ContactType.deleteMany();
+
+    seizureTypes.forEach(async item => {
+      const newSeizureType = new SeizureType(item);
+      await newSeizureType.save();
+    });
+
+    contactTypes.forEach(async item => {
+      const newContactType = new ContactType(item);
+      await newContactType.save();
+    });
+  };
+  populateDatabase();
+};
 
 const authenticateUser = async (req, res, next) => {
   try {

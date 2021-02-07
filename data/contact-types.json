@@ -1,6 +1,6 @@
 [
   {
-    "name": "Emergency",
+    "name": "emergency",
     "categories": [
       "parent",
       "partner",
@@ -10,7 +10,7 @@
     ]
   },
   {
-    "name": "Healthcare",
+    "name": "healthcare",
     "categories": [
       "doctor",
       "hospital",

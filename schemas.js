@@ -91,7 +91,31 @@ export const contactSchema = new mongoose.Schema({
   contactCategory: {
     type: String,
     enum: contactCategories,
+  },
+  contactWallpaper: {
+    type: Boolean,
+    default: false,
   }
+},
+  { timestamps: true }
+);
+
+export const seizureTypeSchema = new mongoose.Schema({
+  name: {
+    type: String
+  },
+  description: {
+    type: String
+  }
+},
+  { timestamps: true }
+);
+
+export const contactTypeSchema = new mongoose.Schema({
+  name: {
+    type: String
+  },
+  categories: [String]
 },
   { timestamps: true }
 );
