@@ -51,7 +51,7 @@ const app = express();
 const listEndpoints = require("express-list-endpoints");
 
 // Middlewares to enable cors and json body parsing
-const allowedDomains = ["https://epilepsy-app.netlify.app", "http://localhost:3000"];
+const allowedDomains = ["https://epilepsy-app.netlify.app", "http://localhost:3000", "http://192.168.1.109:3000"];
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
@@ -93,7 +93,7 @@ app.post("/sessions", async (req, res) => {
   const user = await User.findOne({ email });
   if (user && bcrypt.compareSync(password, user.password)) {
     const seizures = await Seizure.find({ seizureUserId: user._id }).sort({ seizureDate: "desc" }).exec();
-    const contacts = await Contact.find({ contactUserId: user._id });
+    const contacts = await Contact.find({ contactUserId: user._id }).sort({ updatedAt: "desc" }).exec();
     res.status(200).json({
       userId: user._id,
       accessToken: user.accessToken,
@@ -116,7 +116,7 @@ app.get("/userdata", async (req, res) => {
     res.status(403).json({ error: "Access Denied" });
   } else {
     const seizures = await Seizure.find({ seizureUserId: req.user._id }).sort({ seizureDate: "desc" }).exec();
-    const contacts = await Contact.find({ contactUserId: req.user._id });
+    const contacts = await Contact.find({ contactUserId: req.user._id }).sort({ updatedAt: "desc" }).exec();
     res.status(200).json({
       userId: req.user._id,
       accessToken: req.user.accessToken,
@@ -189,7 +189,7 @@ app.get("/contacts", async (req, res) => {
     if (req.header("userId") != req.user._id) {
       res.status(403).json({ error: "Access Denied" });
     } else {
-      const contacts = await Contact.find({ contactUserId: req.user._id });
+      const contacts = await Contact.find({ contactUserId: req.user._id }).sort({ updatedAt: "desc" }).exec();
       res.status(200).json(contacts);
     }
   } catch (err) {
