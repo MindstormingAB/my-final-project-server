@@ -373,6 +373,26 @@ app.delete("/seizures", async (req, res) => {
   };
 });
 
+// Get contact types
+app.get("/contacttypes", async (req, res) => {
+  try {
+    const allContactTypes = await ContactType.find();
+    res.status(200).json(allContactTypes);
+  } catch (err) {
+    res.status(400).json({ message: "Could not find contact types", errors: err })
+  };
+});
+
+// Get seizure types
+app.get("/seizuretypes", async (req, res) => {
+  try {
+    const allSeizureTypes = await SeizureType.find();
+    res.status(200).json(allSeizureTypes);
+  } catch (err) {
+    res.status(400).json({ message: "Could not find seizure types", errors: err })
+  };
+});
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
