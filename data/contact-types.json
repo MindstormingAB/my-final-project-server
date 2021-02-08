@@ -1,20 +1,20 @@
 [
   {
-    "name": "emergency",
+    "name": "Emergency",
     "categories": [
-      "parent",
-      "partner",
-      "sibling",
-      "friend",
-      "relative"
+      "Parent",
+      "Partner",
+      "Sibling",
+      "Friend",
+      "Relative"
     ]
   },
   {
-    "name": "healthcare",
+    "name": "Healthcare",
     "categories": [
-      "doctor",
-      "hospital",
-      "welfare center"
+      "Doctor",
+      "Hospital",
+      "Welfare center"
     ]
   }
 ]
