@@ -119,6 +119,8 @@ app.post("/sessions", async (req, res) => {
   if (user && bcrypt.compareSync(password, user.password)) {
     const seizures = await Seizure.find({ seizureUserId: user._id }).sort({ seizureDate: "desc" }).exec();
     const contacts = await Contact.find({ contactUserId: user._id }).sort({ updatedAt: "desc" }).exec();
+    const allSeizureTypes = await SeizureType.find();
+    const allContactTypes = await ContactType.find();
     res.status(200).json({
       userId: user._id,
       accessToken: user.accessToken,
@@ -128,6 +130,8 @@ app.post("/sessions", async (req, res) => {
       birthDate: user.birthDate,
       seizures: seizures,
       contacts: contacts,
+      seizureTypes: allSeizureTypes,
+      contactTypes: allContactTypes
     });
   } else {
     res.status(404).json({ notFound: true });
@@ -142,6 +146,8 @@ app.get("/userdata", async (req, res) => {
   } else {
     const seizures = await Seizure.find({ seizureUserId: req.user._id }).sort({ seizureDate: "desc" }).exec();
     const contacts = await Contact.find({ contactUserId: req.user._id }).sort({ updatedAt: "desc" }).exec();
+    const allSeizureTypes = await SeizureType.find();
+    const allContactTypes = await ContactType.find();
     res.status(200).json({
       userId: req.user._id,
       accessToken: req.user.accessToken,
@@ -151,6 +157,8 @@ app.get("/userdata", async (req, res) => {
       birthDate: req.user.birthDate,
       seizures: seizures,
       contacts: contacts,
+      seizureTypes: allSeizureTypes,
+      contactTypes: allContactTypes
     });
   };
 });
