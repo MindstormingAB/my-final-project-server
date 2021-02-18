@@ -45,6 +45,7 @@ export const seizureSchema = new mongoose.Schema({
   },
   seizureDate: {
     type: Date,
+    default: Date.now
   },
   seizureLength: {
     hours: {
