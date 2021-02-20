@@ -99,6 +99,8 @@ app.post("/users", async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await new User({ email, password }).save();
+    const allSeizureTypes = await SeizureType.find();
+    const allContactTypes = await ContactType.find();
     res.status(200).json({
       userId: user._id,
       accessToken: user.accessToken,
@@ -106,6 +108,8 @@ app.post("/users", async (req, res) => {
       firstName: user.firstName,
       surname: user.surname,
       birthDate: user.birthDate,
+      seizureTypes: allSeizureTypes,
+      contactTypes: allContactTypes
     });
   } catch (err) {
     res.status(400).json({ message: "Could not create user", errors: err });
