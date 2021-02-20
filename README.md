@@ -62,7 +62,11 @@ On the frontend side of the project (see https://github.com/MindstormingAB/my-fi
 ## View it live
 
 This repository is located on https://github.com/MindstormingAB/my-final-project-server.
+
 The API can be found on https://ep-app-api.herokuapp.com/.
+
 You can take a look at the frontend on https://epilepsy-app.netlify.app/ or https://epilepsy-app-pwa.netlify.app/ for the Progressive Web App version.
+
 You can find more information about the frontend on https://github.com/MindstormingAB/my-final-project-client or https://github.com/MindstormingAB/my-final-project-client-pwa. 
+
 Enjoy!
