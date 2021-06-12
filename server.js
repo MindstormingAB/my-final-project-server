@@ -408,44 +408,57 @@ app.get("/seizuretypes", async (req, res) => {
 // Get weekly seizure statistics
 app.get("/statistics/weekly", authenticateUser);
 app.get("/statistics/weekly", async (req, res) => {
-  // const start = req.params.week * 7;
-  try {
-    const filteredSeizures = await Seizure.aggregate([
-      // {
-      //   $match: { "seizureDate": { $gte: new Date(new Date().setDate(new Date().getDate() - start)), $lt: new Date(new Date().setDate(new Date().getDate() - (start - 7))) } }
-      // },
-      {
-        $group: {
-          _id: {
-            $dateToString: { format: "%Y-%m-%d", date: "$seizureDate" }
-          },
-          count: { $sum: 1 }
+  if (req.header("userId") != req.user._id) {
+    res.status(403).json({ error: "Access Denied" });
+  } else {
+    // const start = req.params.week * 7;
+    try {
+      const seizures = await Seizure.find({ seizureUserId: req.user._id })
+      const filteredSeizures = await Seizure.aggregate([
+        {
+          // $match: { "seizureDate": { $gte: new Date(new Date().setDate(new Date().getDate() - start)), $lt: new Date(new Date().setDate(new Date().getDate() - (start - 7))) } }
+          $match: { "seizureUserId": req.header("userId") }
+        },
+        {
+          $group: {
+            _id: {
+              $dateToString: { format: "%Y-%m-%d", date: "$seizureDate" }
+            },
+            count: { $sum: 1 }
+          }
         }
-      }
-    ]);
-    res.status(200).json(filteredSeizures);
-  } catch (err) {
-    res.status(400).json({ message: "Could not count seizures", errors: err })
+      ]);
+      res.status(200).json(filteredSeizures);
+    } catch (err) {
+      res.status(400).json({ message: "Could not count seizures", errors: err })
+    }
   }
 })
 
 // Get monthly seizure statistics
 app.get("/statistics/monthly", authenticateUser);
 app.get("/statistics/monthly", async (req, res) => {
-  try {
-    const filteredSeizures = await Seizure.aggregate([
-      {
-        $group: {
-          _id: {
-            $dateToString: { format: "%Y-%m", date: "$seizureDate" }
-          },
-          count: { $sum: 1 }
+  if (req.header("userId") != req.user._id) {
+    res.status(403).json({ error: "Access Denied" });
+  } else {
+    try {
+      const filteredSeizures = await Seizure.aggregate([
+        {
+          $match: { "seizureUserId": req.header("userId") }
+        },
+        {
+          $group: {
+            _id: {
+              $dateToString: { format: "%Y-%m", date: "$seizureDate" }
+            },
+            count: { $sum: 1 }
+          }
         }
-      }
-    ]);
-    res.status(200).json(filteredSeizures);
-  } catch (err) {
-    res.status(400).json({ message: "Could not count seizures", errors: err })
+      ]);
+      res.status(200).json(filteredSeizures);
+    } catch (err) {
+      res.status(400).json({ message: "Could not count seizures", errors: err })
+    }
   }
 })
 
