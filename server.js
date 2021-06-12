@@ -405,6 +405,30 @@ app.get("/seizuretypes", async (req, res) => {
   };
 });
 
+// Get weekly seizure statistics
+app.get("/weekly-statistics/:week", authenticateUser);
+app.get("/weekly-statistics/:week", async (req, res) => {
+  const start = req.params.week * 7;
+  try {
+    const filteredSeizures = await Seizure.aggregate([
+      {
+        $match: { "seizureDate": { $gte: new Date(new Date().setDate(new Date().getDate() - start)), $lt: new Date(new Date().setDate(new Date().getDate() - (start - 7))) } }
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: "%Y-%m-%d", date: "$seizureDate" }
+          },
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+    res.status(200).json(filteredSeizures);
+  } catch (err) {
+    res.status(400).json({ message: "Could not count seizures", errors: err })
+  }
+})
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
