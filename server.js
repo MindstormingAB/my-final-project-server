@@ -76,7 +76,7 @@ const app = express();
 const listEndpoints = require("express-list-endpoints");
 
 // Middlewares to enable cors and json body parsing
-const allowedDomains = ["https://epilepsy-app.netlify.app", "https://epilepsy-app-pwa.netlify.app", "https://epilepsy-app-nopwa.netlify.app", "http://localhost:3000", "http://192.168.1.109:3000"];
+const allowedDomains = ["https://ep-app-pwa.netlify.app", "https://epilepsy-app.netlify.app", "https://epilepsy-app-pwa.netlify.app", "https://epilepsy-app-nopwa.netlify.app", "http://localhost:3000", "http://192.168.1.109:3000"];
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
