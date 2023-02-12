@@ -60,7 +60,7 @@ export const seizureSchema = new mongoose.Schema({
   },
   seizureType: {
     type: String,
-    enum: seizureNames,
+    // enum: seizureNames,
   },
   seizureTrigger: {
     type: String,
@@ -78,7 +78,7 @@ export const contactSchema = new mongoose.Schema({
   },
   contactType: {
     type: String,
-    enum: contactNames,
+    // enum: contactNames,
   },
   contactFirstName: {
     type: String,
@@ -91,7 +91,7 @@ export const contactSchema = new mongoose.Schema({
   },
   contactCategory: {
     type: String,
-    enum: contactCategories,
+    // enum: contactCategories,
   },
   contactWallpaper: {
     type: Boolean,
